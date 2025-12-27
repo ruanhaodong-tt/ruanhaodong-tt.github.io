@@ -7,7 +7,8 @@ const resources = [
         sizeBytes: 22.17 * 1024 * 1024,
         format: "APK",
         uploadDate: "2024-01-15",
-        downloadUrl: "shared-files/ehviewer.apk"
+        downloadUrl: "shared-files/ehviewer.apk",
+        downloadCount: 0
     },
     {
         name: "mt管理器.apk",
@@ -16,7 +17,8 @@ const resources = [
         sizeBytes: 26.27 * 1024 * 1024,
         format: "APK",
         uploadDate: "2024-01-20",
-        downloadUrl: "shared-files/mt管理器.apk"
+        downloadUrl: "shared-files/mt管理器.apk",
+        downloadCount: 0
     },
     {
         name: "破解软件.apk",
@@ -25,18 +27,53 @@ const resources = [
         sizeBytes: 6.36 * 1024 * 1024,
         format: "APK",
         uploadDate: "2024-02-01",
-        downloadUrl: "shared-files/破解软件.apk"
+        downloadUrl: "shared-files/破解软件.apk",
+        downloadCount: 0
     }
 ];
 
+// 从localStorage加载下载次数
+function loadDownloadCounts() {
+    const savedCounts = localStorage.getItem('downloadCounts');
+    if (savedCounts) {
+        const counts = JSON.parse(savedCounts);
+        resources.forEach(resource => {
+            if (counts[resource.name] !== undefined) {
+                resource.downloadCount = counts[resource.name];
+            }
+        });
+    }
+}
+
+// 保存下载次数到localStorage
+function saveDownloadCounts() {
+    const counts = {};
+    resources.forEach(resource => {
+        counts[resource.name] = resource.downloadCount;
+    });
+    localStorage.setItem('downloadCounts', JSON.stringify(counts));
+}
+
+// 增加下载次数
+function incrementDownloadCount(resourceName) {
+    const resource = resources.find(r => r.name === resourceName);
+    if (resource) {
+        resource.downloadCount++;
+        saveDownloadCounts();
+        renderResources(resources);
+    }
+}
+
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
+    loadDownloadCounts();
     renderResources(resources);
     initSearch();
     initFilter();
     initThemeToggle();
     initSorting();
     initBatchOperations();
+    initPreviewModal();
 });
 
 // 备用复制方法
@@ -70,6 +107,59 @@ function showCopySuccess(button) {
         button.textContent = originalText;
         button.style.background = '';
     }, 2000);
+}
+
+// 预览模态框功能
+function initPreviewModal() {
+    const modal = document.getElementById('previewModal');
+    const closeBtn = document.getElementById('closePreview');
+    
+    closeBtn.addEventListener('click', function() {
+        modal.classList.remove('active');
+    });
+    
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
+}
+
+function showPreview(url, name) {
+    const modal = document.getElementById('previewModal');
+    const previewBody = document.getElementById('previewBody');
+    const previewTitle = document.getElementById('previewTitle');
+    
+    previewTitle.textContent = name;
+    
+    const fileExt = name.split('.').pop().toUpperCase();
+    
+    if (['JPG', 'PNG', 'GIF', 'JPEG', 'WEBP'].includes(fileExt)) {
+        previewBody.innerHTML = `<img src="${url}" alt="${name}" style="max-width: 100%; max-height: 500px; border-radius: 8px;" />`;
+    } else if (fileExt === 'PDF') {
+        previewBody.innerHTML = `<embed src="${url}" type="application/pdf" style="width: 100%; height: 500px; border-radius: 8px;" />`;
+    } else if (fileExt === 'TXT') {
+        // 尝试加载文本文件
+        previewBody.innerHTML = '<div style="text-align: center; padding: 20px;">正在加载...</div>';
+        fetch(url)
+            .then(response => response.text())
+            .then(text => {
+                previewBody.innerHTML = `<pre style="white-space: pre-wrap; word-wrap: break-word; max-height: 500px; overflow-y: auto; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px;">${escapeHtml(text)}</pre>`;
+            })
+            .catch(err => {
+                previewBody.innerHTML = '<div style="text-align: center; padding: 20px;">无法预览此文件</div>';
+            });
+    } else {
+        previewBody.innerHTML = '<div style="text-align: center; padding: 20px;">此文件类型不支持预览</div>';
+    }
+    
+    modal.classList.add('active');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // 批量操作功能
@@ -280,7 +370,7 @@ function renderResources(resources) {
     if (resources.length === 0) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td colspan="8" class="empty-state">暂无文件</td>
+            <td colspan="9" class="empty-state">暂无文件</td>
         `;
         resourcesContainer.appendChild(tr);
         return;
@@ -297,6 +387,11 @@ function renderResources(resources) {
 function createResourceElement(resource) {
     const tr = document.createElement('tr');
     const icon = getFileIcon(resource.format);
+    
+    // 判断是否可以预览
+    const canPreview = ['JPG', 'PNG', 'GIF', 'TXT', 'PDF'].includes(resource.format);
+    const previewBtn = canPreview ? `<button class="preview-btn" data-url="${resource.downloadUrl}" data-name="${resource.name}" title="预览">👁️</button>` : '';
+    
     tr.innerHTML = `
         <td class="checkbox-column" data-label="选择">
             <input type="checkbox" class="resource-checkbox" data-name="${resource.name}" />
@@ -307,8 +402,10 @@ function createResourceElement(resource) {
         <td data-label="大小">${resource.size}</td>
         <td data-label="格式">${resource.format}</td>
         <td data-label="上传时间">${resource.uploadDate}</td>
+        <td data-label="下载次数">${resource.downloadCount}</td>
         <td data-label="操作">
-            <a href="${resource.downloadUrl}" class="download-btn" download>下载</a>
+            <a href="${resource.downloadUrl}" class="download-btn" download onclick="incrementDownloadCount('${resource.name}')">下载</a>
+            ${previewBtn}
             <button class="copy-link-btn" data-url="${resource.downloadUrl}" title="复制链接">📋</button>
         </td>
     `;
@@ -334,6 +431,16 @@ function createResourceElement(resource) {
             fallbackCopyText(fullUrl, copyBtn);
         }
     });
+
+    // 为预览按钮添加点击事件
+    const previewBtnEl = tr.querySelector('.preview-btn');
+    if (previewBtnEl) {
+        previewBtnEl.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showPreview(this.dataset.url, this.dataset.name);
+        });
+    }
 
     return tr;
 }
