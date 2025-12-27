@@ -71,7 +71,7 @@ function loadDownloadCounts() {
 }
 
 // 通过 GitHub API 更新下载次数
-async function updateDownloadCountViaAPI(resourceName) {
+async function updateDownloadCountViaAPI(resourceName, retryCount = 0) {
     if (!GITHUB_CONFIG.token) {
         console.log('未配置 GitHub Token，无法自动更新下载次数');
         return;
@@ -126,13 +126,22 @@ async function updateDownloadCountViaAPI(resourceName) {
             });
 
             if (!updateResponse.ok) {
-                throw new Error('更新文件失败');
+                const errorData = await updateResponse.json();
+                
+                // 如果是 409 冲突错误，重试
+                if (updateResponse.status === 409 && retryCount < 3) {
+                    console.log(`文件冲突，第 ${retryCount + 1} 次重试...`);
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // 延迟重试
+                    return updateDownloadCountViaAPI(resourceName, retryCount + 1);
+                }
+                
+                throw new Error(`更新文件失败: ${errorData.message}`);
             }
 
             console.log('下载次数更新成功');
         }
     } catch (error) {
-        console.error('更新下载次数失败:', error);
+        console.error('更新下载次数失败:', error.message);
     }
 }
 
