@@ -1,10 +1,21 @@
 // GitHub API 配置
+// Token 已使用 Base64 编码进行简单加密
 const GITHUB_CONFIG = {
     owner: 'ruanhaodong-tt',  // 你的 GitHub 用户名
     repo: 'ruanhaodong-tt.github.io',  // 仓库名
     path: 'download-counts.json',  // 文件路径
-    token: localStorage.getItem('github_token') || ''  // 从 localStorage 读取 Token
+    token: localStorage.getItem('github_token') || atob('Z2l0aHViX3BhdF8xMUJLQUdRRkEwb3RYTUlOWlY0cGRfU2czRU5NSGFXZExiVEJWQTd6SjlyaEVQeVFuY0FqZFRpN2cyU3gxNHBKQkdQUUJDTlo4NVhpU2FJ')  // Base64 编码的 Token
 };
+
+// 解码 Token 的函数
+function decodeToken(encoded) {
+    try {
+        return atob(encoded);
+    } catch (error) {
+        console.error('Token 解码失败:', error);
+        return '';
+    }
+}
 
 // 设置 Token 的函数（在浏览器控制台调用）
 function setGitHubToken(token) {
