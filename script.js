@@ -25,7 +25,7 @@ const resources = [
 
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
-    renderResources();
+    renderResources(resources);
 });
 
 // 渲染资源列表
