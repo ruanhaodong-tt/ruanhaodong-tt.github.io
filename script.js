@@ -32,27 +32,32 @@ const resources = [
     }
 ];
 
-// 从localStorage加载下载次数
+// 从JSON文件加载下载次数
 function loadDownloadCounts() {
-    const savedCounts = localStorage.getItem('downloadCounts');
-    if (savedCounts) {
-        const counts = JSON.parse(savedCounts);
-        resources.forEach(resource => {
-            if (counts[resource.name] !== undefined) {
-                resource.downloadCount = counts[resource.name];
+    fetch('download-counts.json')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
             }
+            throw new Error('无法加载下载次数');
+        })
+        .then(counts => {
+            resources.forEach(resource => {
+                if (counts[resource.name] !== undefined) {
+                    resource.downloadCount = counts[resource.name];
+                }
+            });
+            renderResources(resources);
+        })
+        .catch(err => {
+            console.log('使用初始下载次数:', err.message);
+            renderResources(resources);
         });
-    }
 }
 
-// 保存下载次数到localStorage
-function saveDownloadCounts() {
-    const counts = {};
-    resources.forEach(resource => {
-        counts[resource.name] = resource.downloadCount;
-    });
-    localStorage.setItem('downloadCounts', JSON.stringify(counts));
-}
+// 注意：由于GitHub Pages是静态托管，无法直接写入文件
+// 下载次数需要手动更新到download-counts.json文件
+// 或者使用GitHub API来更新文件（需要配置Token）
 
 // 增加下载次数
 function incrementDownloadCount(resourceName) {
@@ -67,7 +72,6 @@ function incrementDownloadCount(resourceName) {
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
     loadDownloadCounts();
-    renderResources(resources);
     initSearch();
     initFilter();
     initThemeToggle();
