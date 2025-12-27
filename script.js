@@ -37,7 +37,64 @@ document.addEventListener('DOMContentLoaded', function() {
     initThemeToggle();
     initSorting();
     initBatchOperations();
+    initCopyLink();
 });
+
+// 复制链接功能
+function initCopyLink() {
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('copy-link-btn')) {
+            const url = e.target.dataset.url;
+            const fullUrl = window.location.origin + '/' + url;
+            
+            // 使用 Clipboard API 复制
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullUrl).then(function() {
+                    showCopySuccess(e.target);
+                }).catch(function() {
+                    // 如果 Clipboard API 失败，使用备用方法
+                    fallbackCopyText(fullUrl, e.target);
+                });
+            } else {
+                // 使用备用方法
+                fallbackCopyText(fullUrl, e.target);
+            }
+        }
+    });
+}
+
+// 备用复制方法
+function fallbackCopyText(text, button) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopySuccess(button);
+    } catch (err) {
+        alert('复制失败，请手动复制链接');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// 显示复制成功提示
+function showCopySuccess(button) {
+    const originalText = button.textContent;
+    button.textContent = '✓';
+    button.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+    
+    setTimeout(function() {
+        button.textContent = originalText;
+        button.style.background = '';
+    }, 2000);
+}
 
 // 批量操作功能
 function initBatchOperations() {
