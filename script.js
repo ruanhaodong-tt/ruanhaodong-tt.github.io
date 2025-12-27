@@ -1,49 +1,32 @@
+// 资源数据 - shared-files 文件夹中的文件列表
+const resources = [
+    {
+        name: "ehviewer.apk",
+        description: "EhViewer 应用",
+        size: "未知大小",
+        format: "APK",
+        downloadUrl: "shared-files/ehviewer.apk"
+    },
+    {
+        name: "mt管理器.apk",
+        description: "MT管理器应用",
+        size: "未知大小",
+        format: "APK",
+        downloadUrl: "shared-files/mt管理器.apk"
+    },
+    {
+        name: "破解软件.apk",
+        description: "破解软件应用",
+        size: "未知大小",
+        format: "APK",
+        downloadUrl: "shared-files/破解软件.apk"
+    }
+];
+
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
-    loadResources();
+    renderResources();
 });
-
-// 加载资源列表
-function loadResources() {
-    fetch('shared-files/')
-        .then(response => response.text())
-        .then(text => {
-            const files = parseFileList(text);
-            renderResources(files);
-        })
-        .catch(error => {
-            console.error('加载文件列表失败:', error);
-            renderResources([]);
-        });
-}
-
-// 解析文件列表
-function parseFileList(text) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/html');
-    const links = doc.querySelectorAll('a[href]');
-
-    const files = [];
-    links.forEach(link => {
-        const href = link.getAttribute('href');
-        // 排除父目录和目录本身
-        if (href && href !== '../' && !href.endsWith('/')) {
-            const filename = decodeURIComponent(href.split('/').pop());
-            const extension = filename.split('.').pop().toUpperCase();
-            const size = link.nextElementSibling ? link.nextElementSibling.textContent.trim() : '未知大小';
-
-            files.push({
-                name: filename,
-                description: filename,
-                size: size,
-                format: extension,
-                downloadUrl: `shared-files/${href}`
-            });
-        }
-    });
-
-    return files;
-}
 
 // 渲染资源列表
 function renderResources(resources) {
