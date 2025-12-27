@@ -20,20 +20,41 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px 20px;
 }
 
 header {
     text-align: center;
     margin-bottom: 30px;
-    padding: 30px 0;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 35px 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 24px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 100%;
+    animation: gradientMove 3s linear infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
 }
 
 header h1 {
@@ -49,13 +70,31 @@ header h1 {
 }
 
 .resource-list {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 24px;
+    padding: 35px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.resource-list::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 100%;
+    animation: gradientMove 3s linear infinite;
+    opacity: 0.5;
 }
 
 .resource-list h2 {
@@ -254,9 +293,22 @@ body.dark-mode {
 body.dark-mode .container header,
 body.dark-mode .resource-list,
 body.dark-mode footer {
-    background: rgba(22, 33, 62, 0.95);
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.98) 0%, rgba(22, 33, 62, 0.95) 100%);
     color: #e0e0e0;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode header::before,
+body.dark-mode .resource-list::before,
+body.dark-mode footer::before {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 100%;
+    animation: gradientMove 3s linear infinite;
+    opacity: 0.7;
 }
 
 body.dark-mode header h1 {
@@ -272,11 +324,12 @@ body.dark-mode .resources-table thead {
 }
 
 body.dark-mode .resources-table tbody tr {
-    border-bottom-color: #2a2a4a;
+    border-bottom-color: rgba(42, 42, 74, 0.8);
 }
 
 body.dark-mode .resources-table tbody tr:hover {
-    background-color: #1f1f3a;
+    background: rgba(31, 31, 58, 0.8);
+    transform: translateX(5px);
 }
 
 body.dark-mode .resources-table td {
@@ -342,32 +395,33 @@ body.dark-mode .action-btn.delete-btn:hover {
 .resources-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .resources-table thead {
-    background-color: #34495e;
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
     color: white;
 }
 
 .resources-table th {
-    padding: 12px 15px;
+    padding: 16px 18px;
     text-align: left;
     font-weight: 600;
     font-size: 0.95rem;
 }
 
 .resources-table tbody tr {
-    border-bottom: 1px solid #e9ecef;
-    transition: background-color 0.3s ease;
+    border-bottom: 1px solid rgba(233, 236, 239, 0.8);
+    transition: all 0.3s ease;
 }
 
 .resources-table tbody tr:hover {
-    background-color: #f8f9fa;
+    background: rgba(248, 249, 250, 0.8);
+    transform: translateX(5px);
 }
 
 .resources-table td {
-    padding: 12px 15px;
+    padding: 16px 18px;
     color: #333;
     font-size: 0.9rem;
 }
@@ -385,6 +439,11 @@ body.dark-mode .action-btn.delete-btn:hover {
 .resources-table td:nth-child(3),
 .resources-table td:nth-child(4) {
     color: #95a5a6;
+    font-size: 0.85rem;
+}
+
+.resources-table td:nth-child(5) {
+    color: #7f8c8d;
     font-size: 0.85rem;
 }
 
@@ -440,13 +499,31 @@ body.dark-mode .action-btn.delete-btn:hover {
 footer {
     margin-top: 30px;
     text-align: center;
-    padding: 25px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-radius: 24px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 100%;
+    animation: gradientMove 3s linear infinite;
+    opacity: 0.5;
 }
 
 .developer-info {
@@ -505,13 +582,25 @@ footer {
     }
 
     .resources-table tr {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         border: 1px solid rgba(233, 236, 239, 0.8);
-        border-radius: 12px;
-        padding: 18px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.1),
+            0 0 0 1px rgba(255, 255, 255, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    .resources-table tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.15),
+            0 0 0 1px rgba(255, 255, 255, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .resources-table td {
@@ -579,8 +668,20 @@ footer {
 /* 深色模式下的移动端样式 */
 @media (max-width: 768px) {
     body.dark-mode .resources-table tr {
-        background: rgba(31, 31, 58, 0.95);
+        background: linear-gradient(135deg, rgba(31, 31, 58, 0.98) 0%, rgba(31, 31, 58, 0.95) 100%);
         border-color: rgba(42, 42, 74, 0.8);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+body.dark-mode .resources-table tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
 
     body.dark-mode .resources-table td::before {
