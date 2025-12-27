@@ -104,11 +104,17 @@ header h1 {
 .download-tip {
     color: #f39c12;
     font-size: 0.9rem;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     padding: 10px 15px;
     background: rgba(243, 156, 18, 0.1);
     border-left: 4px solid #f39c12;
     border-radius: 4px;
+}
+
+.info-tip {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    border-left-color: #3498db;
 }
 
 .resource-count {
@@ -380,6 +386,11 @@ body.dark-mode .resource-count {
 body.dark-mode .download-tip {
     color: #f39c12;
     background: rgba(243, 156, 18, 0.15);
+}
+
+body.dark-mode .info-tip {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.15);
 }
 
 body.dark-mode .sortable:hover {
