@@ -3,8 +3,15 @@ const GITHUB_CONFIG = {
     owner: 'ruanhaodong-tt',  // 你的 GitHub 用户名
     repo: 'ruanhaodong-tt.github.io',  // 仓库名
     path: 'download-counts.json',  // 文件路径
-    issueNumber: 1  // 用于记录下载更新的 Issue 编号
+    token: localStorage.getItem('github_token') || ''  // 从 localStorage 读取 Token
 };
+
+// 设置 Token 的函数（在浏览器控制台调用）
+function setGitHubToken(token) {
+    localStorage.setItem('github_token', token);
+    GITHUB_CONFIG.token = token;
+    console.log('GitHub Token 已设置');
+}
 
 // 资源数据 - shared-files 文件夹中的文件列表
 const resources = [
@@ -63,33 +70,69 @@ function loadDownloadCounts() {
         });
 }
 
-// 通过 GitHub Issues API 记录下载（供 GitHub Actions 使用）
+// 通过 GitHub API 更新下载次数
 async function updateDownloadCountViaAPI(resourceName) {
+    if (!GITHUB_CONFIG.token) {
+        console.log('未配置 GitHub Token，无法自动更新下载次数');
+        return;
+    }
+
     try {
-        // 获取当前 Issue 的评论
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/issues/${GITHUB_CONFIG.issueNumber}/comments`;
-        
-        // 创建新评论记录这次下载
-        const commentBody = `📥 下载记录: ${resourceName}\n🕐 时间: ${new Date().toISOString()}`;
-        
+        // 1. 获取当前文件的 SHA
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
         const response = await fetch(url, {
-            method: 'POST',
             headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                body: commentBody
-            })
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
         });
 
         if (!response.ok) {
-            throw new Error('记录下载失败');
+            throw new Error('获取文件失败');
         }
 
-        console.log('下载记录已提交到 GitHub Issues');
+        const data = await response.json();
+        const sha = data.sha;
+        const currentCounts = JSON.parse(atob(data.content));
+
+        // 2. 更新下载次数
+        if (currentCounts[resourceName] !== undefined) {
+            currentCounts[resourceName]++;
+            
+            // 3. 更新资源数据
+            const resource = resources.find(r => r.name === resourceName);
+            if (resource) {
+                resource.downloadCount = currentCounts[resourceName];
+                renderResources(resources);
+            }
+
+            // 4. 提交更新
+            const updatedContent = btoa(JSON.stringify(currentCounts, null, 2));
+            const updateUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+            
+            const updateResponse = await fetch(updateUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify({
+                    message: `Update download count for ${resourceName}`,
+                    content: updatedContent,
+                    sha: sha,
+                    branch: 'master'
+                })
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('更新文件失败');
+            }
+
+            console.log('下载次数更新成功');
+        }
     } catch (error) {
-        console.error('记录下载失败:', error);
+        console.error('更新下载次数失败:', error);
     }
 }
 
@@ -100,8 +143,12 @@ function incrementDownloadCount(resourceName) {
         resource.downloadCount++;
         renderResources(resources);
         
-        // 记录下载到 GitHub Issues
-        updateDownloadCountViaAPI(resourceName);
+        // 尝试通过 GitHub API 更新
+        if (GITHUB_CONFIG.token) {
+            updateDownloadCountViaAPI(resourceName);
+        } else {
+            console.log('未配置 GitHub Token，下载次数仅在本地更新');
+        }
     }
 }
 
