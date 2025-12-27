@@ -1,13 +1,52 @@
-// 资源数据 - 可以轻松添加更多资源
-const resources = [];
-
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
-    renderResources();
+    loadResources();
 });
 
+// 加载资源列表
+function loadResources() {
+    fetch('shared-files/')
+        .then(response => response.text())
+        .then(text => {
+            const files = parseFileList(text);
+            renderResources(files);
+        })
+        .catch(error => {
+            console.error('加载文件列表失败:', error);
+            renderResources([]);
+        });
+}
+
+// 解析文件列表
+function parseFileList(text) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    const links = doc.querySelectorAll('a[href]');
+
+    const files = [];
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        // 排除父目录和目录本身
+        if (href && href !== '../' && !href.endsWith('/')) {
+            const filename = decodeURIComponent(href.split('/').pop());
+            const extension = filename.split('.').pop().toUpperCase();
+            const size = link.nextElementSibling ? link.nextElementSibling.textContent.trim() : '未知大小';
+
+            files.push({
+                name: filename,
+                description: filename,
+                size: size,
+                format: extension,
+                downloadUrl: `shared-files/${href}`
+            });
+        }
+    });
+
+    return files;
+}
+
 // 渲染资源列表
-function renderResources() {
+function renderResources(resources) {
     const resourcesContainer = document.getElementById('resources');
 
     // 清空容器
@@ -43,28 +82,3 @@ function createResourceElement(resource) {
 
     return tr;
 }
-
-// 添加新资源的函数（供未来扩展使用）
-function addResource(resource) {
-    // 生成新ID
-    const newId = resources.length > 0 ? Math.max(...resources.map(r => r.id)) + 1 : 1;
-    resource.id = newId;
-    
-    // 添加到资源数组
-    resources.push(resource);
-    
-    // 重新渲染列表
-    renderResources();
-}
-
-// 示例：如何使用addResource函数添加新资源
-/*
-const newResource = {
-    name: "新资源",
-    description: "这是一个新添加的资源",
-    size: "3.0 MB",
-    format: "ZIP",
-    downloadUrl: "path/to/new/resource.zip"
-};
-addResource(newResource);
-*/
