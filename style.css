@@ -44,44 +44,53 @@ header h1 {
     font-size: 1.8rem;
 }
 
-.resources-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+.resources-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-.resource-item {
+.resources-table thead {
+    background-color: #34495e;
+    color: white;
+}
+
+.resources-table th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.resources-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.3s ease;
+}
+
+.resources-table tbody tr:hover {
     background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.resource-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.resource-item h3 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 1.3rem;
-}
-
-.resource-item p {
-    color: #6c757d;
-    margin-bottom: 15px;
+.resources-table td {
+    padding: 12px 15px;
+    color: #333;
     font-size: 0.9rem;
 }
 
-.resource-item .resource-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    font-size: 0.8rem;
+.resources-table td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.resources-table td:nth-child(2) {
+    color: #6c757d;
+    max-width: 300px;
+}
+
+.resources-table td:nth-child(3),
+.resources-table td:nth-child(4) {
     color: #95a5a6;
+    font-size: 0.85rem;
 }
 
 .download-btn {
@@ -89,12 +98,11 @@ header h1 {
     background-color: #3498db;
     color: white;
     text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    padding: 8px 16px;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
-    text-align: center;
-    width: 100%;
-    font-weight: bold;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
 .download-btn:hover {
@@ -120,37 +128,39 @@ footer {
     .container {
         padding: 10px;
     }
-    
+
     header h1 {
         font-size: 2rem;
     }
-    
+
     .resource-list h2 {
         font-size: 1.5rem;
     }
-    
-    .resources-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+
+    .resources-table {
+        font-size: 0.85rem;
     }
-    
-    .resource-item {
-        padding: 15px;
+
+    .resources-table th,
+    .resources-table td {
+        padding: 8px 10px;
     }
-    
-    .resource-item h3 {
-        font-size: 1.2rem;
+
+    .resources-table td:nth-child(2) {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .download-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
     }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
-    .resources-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1025px) {
-    .resources-grid {
-        grid-template-columns: repeat(3, 1fr);
+    .resources-table td:nth-child(2) {
+        max-width: 200px;
     }
 }

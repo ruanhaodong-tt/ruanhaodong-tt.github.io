@@ -55,19 +55,16 @@ function renderResources() {
 
 // 创建单个资源元素
 function createResourceElement(resource) {
-    const div = document.createElement('div');
-    div.className = 'resource-item';
-    div.innerHTML = `
-        <h3>${resource.name}</h3>
-        <p>${resource.description}</p>
-        <div class="resource-meta">
-            <span>大小: ${resource.size}</span>
-            <span>格式: ${resource.format}</span>
-        </div>
-        <a href="${resource.downloadUrl}" class="download-btn" download>${resource.name}下载</a>
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>${resource.name}</td>
+        <td>${resource.description}</td>
+        <td>${resource.size}</td>
+        <td>${resource.format}</td>
+        <td><a href="${resource.downloadUrl}" class="download-btn" download>下载</a></td>
     `;
-    
-    return div;
+
+    return tr;
 }
 
 // 添加新资源的函数（供未来扩展使用）
