@@ -1,0 +1,69 @@
+name: Update Download Counts
+
+on:
+  workflow_dispatch:  # 手动触发
+  schedule:
+    - cron: '0 */6 * * *'  # 每6小时自动运行一次
+
+jobs:
+  update-counts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Download current download-counts.json
+        run: |
+          # 从 GitHub 获取当前的下载次数
+          curl -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/ruanhaodong-tt/ruanhaodong-tt.github.io/contents/download-counts.json \
+            | jq -r '.content' | base64 -d > download-counts.json
+      
+      - name: Fetch and count downloads from Issues
+        run: |
+          # 获取 Issue #1 的所有评论
+          curl -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/ruanhaodong-tt/ruanhaodong-tt.github.io/issues/1/comments \
+            | jq -r '.[] | .body' > comments.txt
+          
+          # 统计每个文件的下载次数
+          node << 'EOF'
+          const fs = require('fs');
+          const comments = fs.readFileSync('comments.txt', 'utf8');
+          const counts = JSON.parse(fs.readFileSync('download-counts.json', 'utf8'));
+          
+          // 解析评论并统计
+          const lines = comments.split('\n');
+          lines.forEach(line => {
+            const match = line.match(/📥 下载记录: (.+)/);
+            if (match) {
+              const filename = match[1];
+              if (counts[filename] !== undefined) {
+                counts[filename]++;
+              }
+            }
+          });
+          
+          // 保存更新后的计数
+          fs.writeFileSync('download-counts.json', JSON.stringify(counts, null, 2));
+          console.log('下载次数已更新');
+          EOF
+      
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add download-counts.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto update download counts from Issues [skip ci]"
+          git push
