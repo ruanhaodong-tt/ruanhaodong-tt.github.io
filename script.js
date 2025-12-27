@@ -3,21 +3,21 @@ const resources = [
     {
         name: "ehviewer.apk",
         description: "EhViewer 应用",
-        size: "未知大小",
+        size: "22.17 MB",
         format: "APK",
         downloadUrl: "shared-files/ehviewer.apk"
     },
     {
         name: "mt管理器.apk",
         description: "MT管理器应用",
-        size: "未知大小",
+        size: "26.27 MB",
         format: "APK",
         downloadUrl: "shared-files/mt管理器.apk"
     },
     {
         name: "破解软件.apk",
         description: "破解软件应用",
-        size: "未知大小",
+        size: "6.36 MB",
         format: "APK",
         downloadUrl: "shared-files/破解软件.apk"
     }
