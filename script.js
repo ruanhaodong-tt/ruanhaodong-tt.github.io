@@ -1,3 +1,13 @@
+// GitHub API 配置
+// 请在 GitHub 上创建 Personal Access Token，并替换下面的 YOUR_GITHUB_TOKEN
+// Token 需要的权限：repo (完整仓库访问权限)
+const GITHUB_CONFIG = {
+    owner: 'ruanhaodong-tt',  // 你的 GitHub 用户名
+    repo: 'ruanhaodong-tt.github.io',  // 仓库名
+    path: 'download-counts.json',  // 文件路径
+    token: ''  // 在这里填入你的 GitHub Personal Access Token
+};
+
 // 资源数据 - shared-files 文件夹中的文件列表
 const resources = [
     {
@@ -55,17 +65,85 @@ function loadDownloadCounts() {
         });
 }
 
-// 注意：由于GitHub Pages是静态托管，无法直接写入文件
-// 下载次数需要手动更新到download-counts.json文件
-// 或者使用GitHub API来更新文件（需要配置Token）
+// 通过 GitHub API 更新下载次数
+async function updateDownloadCountViaAPI(resourceName) {
+    if (!GITHUB_CONFIG.token) {
+        console.log('未配置 GitHub Token，无法自动更新下载次数');
+        return;
+    }
+
+    try {
+        // 1. 获取当前文件的 SHA
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('获取文件失败');
+        }
+
+        const data = await response.json();
+        const sha = data.sha;
+        const currentCounts = JSON.parse(atob(data.content));
+
+        // 2. 更新下载次数
+        if (currentCounts[resourceName] !== undefined) {
+            currentCounts[resourceName]++;
+            
+            // 3. 更新资源数据
+            const resource = resources.find(r => r.name === resourceName);
+            if (resource) {
+                resource.downloadCount = currentCounts[resourceName];
+                renderResources(resources);
+            }
+
+            // 4. 提交更新
+            const updatedContent = btoa(JSON.stringify(currentCounts, null, 2));
+            const updateUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+            
+            const updateResponse = await fetch(updateUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify({
+                    message: `Update download count for ${resourceName}`,
+                    content: updatedContent,
+                    sha: sha,
+                    branch: 'master'
+                })
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('更新文件失败');
+            }
+
+            console.log('下载次数更新成功');
+        }
+    } catch (error) {
+        console.error('更新下载次数失败:', error);
+    }
+}
 
 // 增加下载次数
 function incrementDownloadCount(resourceName) {
     const resource = resources.find(r => r.name === resourceName);
     if (resource) {
         resource.downloadCount++;
-        saveDownloadCounts();
         renderResources(resources);
+        
+        // 尝试通过 GitHub API 更新
+        if (GITHUB_CONFIG.token) {
+            updateDownloadCountViaAPI(resourceName);
+        } else {
+            console.log('未配置 GitHub Token，下载次数仅在本地更新');
+        }
     }
 }
 
