@@ -27,7 +27,7 @@ header {
     text-align: center;
     margin-bottom: 30px;
     padding: 35px 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.75) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
     border-radius: 24px;
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.15),
@@ -69,7 +69,7 @@ header h1 {
 }
 
 .resource-list {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.75) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
     border-radius: 24px;
     padding: 35px;
     box-shadow: 
@@ -223,7 +223,7 @@ header h1 {
     border: 2px solid rgba(233, 236, 239, 0.6);
     border-radius: 12px;
     font-size: 0.95rem;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 }
@@ -232,7 +232,7 @@ header h1 {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .filter-box {
@@ -245,7 +245,7 @@ header h1 {
     border: 2px solid rgba(233, 236, 239, 0.6);
     border-radius: 12px;
     font-size: 0.95rem;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -255,7 +255,7 @@ header h1 {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .theme-toggle {
@@ -293,7 +293,7 @@ body.dark-mode {
 body.dark-mode .container header,
 body.dark-mode .resource-list,
 body.dark-mode footer {
-    background: linear-gradient(135deg, rgba(22, 33, 62, 0.85) 0%, rgba(22, 33, 62, 0.75) 100%);
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.5) 0%, rgba(22, 33, 62, 0.5) 100%);
     color: #e0e0e0;
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
@@ -327,7 +327,7 @@ body.dark-mode .resources-table tbody tr {
 }
 
 body.dark-mode .resources-table tbody tr:hover {
-    background: rgba(31, 31, 58, 0.6);
+    background: rgba(31, 31, 58, 0.5);
     transform: translateX(5px);
 }
 
@@ -347,7 +347,7 @@ body.dark-mode .resources-table td:nth-child(4) {
 
 body.dark-mode .search-box input,
 body.dark-mode .filter-box select {
-    background: rgba(31, 31, 58, 0.7);
+    background: rgba(31, 31, 58, 0.5);
     border-color: rgba(42, 42, 74, 0.6);
     color: #e0e0e0;
 }
@@ -356,7 +356,7 @@ body.dark-mode .search-box input:focus,
 body.dark-mode .filter-box select:focus {
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-    background: rgba(31, 31, 58, 0.85);
+    background: rgba(31, 31, 58, 0.7);
 }
 
 body.dark-mode .developer-info {
@@ -399,7 +399,7 @@ body.dark-mode .action-btn.delete-btn:hover {
 }
 
 .resources-table thead {
-    background: linear-gradient(135deg, rgba(52, 73, 94, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
+    background: linear-gradient(135deg, rgba(52, 73, 94, 0.5) 0%, rgba(44, 62, 80, 0.5) 100%);
     color: white;
     backdrop-filter: blur(10px);
 }
@@ -417,7 +417,7 @@ body.dark-mode .action-btn.delete-btn:hover {
 }
 
 .resources-table tbody tr:hover {
-    background: rgba(248, 249, 250, 0.6);
+    background: rgba(248, 249, 250, 0.5);
     transform: translateX(5px);
 }
 
@@ -501,7 +501,7 @@ footer {
     margin-top: 30px;
     text-align: center;
     padding: 30px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.75) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
     border-radius: 24px;
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.15),
@@ -586,7 +586,7 @@ footer::before {
         border: 1px solid rgba(233, 236, 239, 0.6);
         border-radius: 16px;
         padding: 20px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.75) 100%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 100%);
         backdrop-filter: blur(20px);
         box-shadow: 
             0 8px 32px rgba(0, 0, 0, 0.15),
@@ -599,7 +599,7 @@ footer::before {
         box-shadow: 
             0 12px 40px rgba(0, 0, 0, 0.2),
             0 0 0 1px rgba(255, 255, 255, 0.4);
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%);
     }
 
     .resources-table td {
@@ -667,7 +667,7 @@ footer::before {
 /* 深色模式下的移动端样式 */
 @media (max-width: 768px) {
     body.dark-mode .resources-table tr {
-        background: linear-gradient(135deg, rgba(31, 31, 58, 0.85) 0%, rgba(31, 31, 58, 0.75) 100%);
+        background: linear-gradient(135deg, rgba(31, 31, 58, 0.5) 0%, rgba(31, 31, 58, 0.5) 100%);
         border-color: rgba(42, 42, 74, 0.6);
         box-shadow: 
             0 8px 32px rgba(0, 0, 0, 0.4),
@@ -679,7 +679,7 @@ body.dark-mode .resources-table tr:hover {
         box-shadow: 
             0 12px 40px rgba(0, 0, 0, 0.5),
             0 0 0 1px rgba(255, 255, 255, 0.15);
-        background: linear-gradient(135deg, rgba(31, 31, 58, 0.9) 0%, rgba(31, 31, 58, 0.8) 100%);
+        background: linear-gradient(135deg, rgba(31, 31, 58, 0.6) 0%, rgba(31, 31, 58, 0.6) 100%);
     }
 
     body.dark-mode .resources-table td::before {
