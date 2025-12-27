@@ -37,31 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initThemeToggle();
     initSorting();
     initBatchOperations();
-    initCopyLink();
 });
-
-// 复制链接功能
-function initCopyLink() {
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('copy-link-btn')) {
-            const url = e.target.dataset.url;
-            const fullUrl = window.location.origin + '/' + url;
-            
-            // 使用 Clipboard API 复制
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fullUrl).then(function() {
-                    showCopySuccess(e.target);
-                }).catch(function() {
-                    // 如果 Clipboard API 失败，使用备用方法
-                    fallbackCopyText(fullUrl, e.target);
-                });
-            } else {
-                // 使用备用方法
-                fallbackCopyText(fullUrl, e.target);
-            }
-        }
-    });
-}
 
 // 备用复制方法
 function fallbackCopyText(text, button) {
@@ -336,6 +312,28 @@ function createResourceElement(resource) {
             <button class="copy-link-btn" data-url="${resource.downloadUrl}" title="复制链接">📋</button>
         </td>
     `;
+
+    // 为复制按钮添加点击事件
+    const copyBtn = tr.querySelector('.copy-link-btn');
+    copyBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = this.dataset.url;
+        const fullUrl = window.location.origin + '/' + url;
+        
+        // 使用 Clipboard API 复制
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullUrl).then(function() {
+                showCopySuccess(copyBtn);
+            }).catch(function() {
+                // 如果 Clipboard API 失败，使用备用方法
+                fallbackCopyText(fullUrl, copyBtn);
+            });
+        } else {
+            // 使用备用方法
+            fallbackCopyText(fullUrl, copyBtn);
+        }
+    });
 
     return tr;
 }
