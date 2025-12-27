@@ -6,7 +6,7 @@ const resources = [
         description: "这是一个示例文档，展示资源分享站的功能",
         size: "2.5 MB",
         format: "PDF",
-        downloadUrl: "#"
+        downloadUrl: "shared-files/example.pdf"
     },
     {
         id: 2,
@@ -14,7 +14,7 @@ const resources = [
         description: "示例图片资源，用于测试下载功能",
         size: "1.8 MB",
         format: "JPG",
-        downloadUrl: "#"
+        downloadUrl: "shared-files/example.jpg"
     },
     {
         id: 3,
@@ -22,7 +22,7 @@ const resources = [
         description: "示例音频文件，支持多种格式",
         size: "5.2 MB",
         format: "MP3",
-        downloadUrl: "#"
+        downloadUrl: "shared-files/example.mp3"
     },
     {
         id: 4,
@@ -30,7 +30,7 @@ const resources = [
         description: "示例视频文件，高清画质",
         size: "15.8 MB",
         format: "MP4",
-        downloadUrl: "#"
+        downloadUrl: "shared-files/example.mp4"
     }
 ];
 
@@ -66,15 +66,6 @@ function createResourceElement(resource) {
         </div>
         <a href="${resource.downloadUrl}" class="download-btn" download>${resource.name}下载</a>
     `;
-    
-    // 添加点击事件处理（如果需要）
-    const downloadBtn = div.querySelector('.download-btn');
-    downloadBtn.addEventListener('click', function(e) {
-        if (resource.downloadUrl === '#') {
-            e.preventDefault();
-            alert('此为示例资源，下载功能尚未实现。请在实际使用时替换为真实的下载链接。');
-        }
-    });
     
     return div;
 }
