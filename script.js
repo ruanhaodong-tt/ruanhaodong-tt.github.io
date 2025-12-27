@@ -1,38 +1,5 @@
 // 资源数据 - 可以轻松添加更多资源
-const resources = [
-    {
-        id: 1,
-        name: "示例文档",
-        description: "这是一个示例文档，展示资源分享站的功能",
-        size: "2.5 MB",
-        format: "PDF",
-        downloadUrl: "shared-files/example.pdf"
-    },
-    {
-        id: 2,
-        name: "示例图片",
-        description: "示例图片资源，用于测试下载功能",
-        size: "1.8 MB",
-        format: "JPG",
-        downloadUrl: "shared-files/example.jpg"
-    },
-    {
-        id: 3,
-        name: "示例音频",
-        description: "示例音频文件，支持多种格式",
-        size: "5.2 MB",
-        format: "MP3",
-        downloadUrl: "shared-files/example.mp3"
-    },
-    {
-        id: 4,
-        name: "示例视频",
-        description: "示例视频文件，高清画质",
-        size: "15.8 MB",
-        format: "MP4",
-        downloadUrl: "shared-files/example.mp4"
-    }
-];
+const resources = [];
 
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
@@ -42,10 +9,20 @@ document.addEventListener('DOMContentLoaded', function() {
 // 渲染资源列表
 function renderResources() {
     const resourcesContainer = document.getElementById('resources');
-    
+
     // 清空容器
     resourcesContainer.innerHTML = '';
-    
+
+    // 如果没有资源，显示空状态
+    if (resources.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td colspan="5" class="empty-state">暂无文件</td>
+        `;
+        resourcesContainer.appendChild(tr);
+        return;
+    }
+
     // 遍历资源并创建HTML
     resources.forEach(resource => {
         const resourceElement = createResourceElement(resource);
