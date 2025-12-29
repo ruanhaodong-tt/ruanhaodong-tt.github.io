@@ -1,4 +1,4 @@
-// GitHub API 配置
+﻿// GitHub API 配置
 // Token 已使用 Base64 编码进行简单加密
 const GITHUB_CONFIG = {
     owner: 'ruanhaodong-tt',  // 你的 GitHub 用户名
@@ -25,34 +25,26 @@ function setGitHubToken(token) {
 }
 
 // 资源数据 - shared-files 文件夹中的文件列表
+// Resource data - files in shared-files folder
+// Auto-generated on 2025-12-29 18:24:13
 const resources = [
     {
-        name: "ehviewer.apk",
-        description: "EhViewer 应用",
-        size: "22.17 MB",
-        sizeBytes: 22.17 * 1024 * 1024,
-        format: "APK",
-        uploadDate: "2024-01-15",
-        downloadUrl: "shared-files/ehviewer.apk",
-        downloadCount: 0
-    },
-    {
         name: "mt管理器.apk",
-        description: "MT管理器应用",
+        description: "mt管理器",
         size: "26.27 MB",
-        sizeBytes: 26.27 * 1024 * 1024,
+        sizeBytes: 27550837,
         format: "APK",
-        uploadDate: "2024-01-20",
+        uploadDate: "2025-12-27",
         downloadUrl: "shared-files/mt管理器.apk",
         downloadCount: 0
     },
     {
         name: "破解软件.apk",
-        description: "破解软件应用",
+        description: "破解软件",
         size: "6.36 MB",
-        sizeBytes: 6.36 * 1024 * 1024,
+        sizeBytes: 6665678,
         format: "APK",
-        uploadDate: "2024-02-01",
+        uploadDate: "2025-12-27",
         downloadUrl: "shared-files/破解软件.apk",
         downloadCount: 0
     }
