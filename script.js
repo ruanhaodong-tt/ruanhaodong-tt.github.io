@@ -232,6 +232,9 @@ function startDownloadCountRefresh() {
 
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
+    // 先渲染资源列表
+    renderResources(resources);
+    // 再加载下载次数
     loadDownloadCounts();
     initSearch();
     initFilter();
