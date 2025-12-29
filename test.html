@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面</title>
+</head>
+<body>
+    <h1>测试页面</h1>
+    <div id="test">正在测试...</div>
+    
+    <script>
+        console.log('脚本开始执行');
+        
+        const resources = [
+            { name: "测试文件.apk", description: "测试", size: "1 MB", format: "APK" }
+        ];
+        
+        console.log('resources 数组:', resources);
+        console.log('resources.length:', resources.length);
+        
+        const testDiv = document.getElementById('test');
+        if (testDiv) {
+            testDiv.innerHTML = `找到 ${resources.length} 个资源`;
+            console.log('成功更新 DOM');
+        } else {
+            console.error('找不到 testDiv 元素');
+        }
+        
+        console.log('脚本执行完成');
+    </script>
+</body>
+</html>
