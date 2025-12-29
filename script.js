@@ -1,30 +1,4 @@
-﻿// GitHub API 配置
-// Token 已使用 Base64 编码进行简单加密
-const GITHUB_CONFIG = {
-    owner: 'ruanhaodong-tt',  // 你的 GitHub 用户名
-    repo: 'ruanhaodong-tt.github.io',  // 仓库名
-    path: 'download-counts.json',  // 文件路径
-    token: localStorage.getItem('github_token') || atob('Z2l0aHViX3BhdF8xMUJLQUdRRkEwb3RYTUlOWlY0cGRfU2czRU5NSGFXZExiVEJWQTd6SjlyaEVQeVFuY0FqZFRpN2cyU3gxNHBKQkdQUUJDTlo4NVhpU2FJ')  // Base64 编码的 Token
-};
-
-// 解码 Token 的函数
-function decodeToken(encoded) {
-    try {
-        return atob(encoded);
-    } catch (error) {
-        console.error('Token 解码失败:', error);
-        return '';
-    }
-}
-
-// 设置 Token 的函数（在浏览器控制台调用）
-function setGitHubToken(token) {
-    localStorage.setItem('github_token', token);
-    GITHUB_CONFIG.token = token;
-    console.log('GitHub Token 已设置');
-}
-
-// 资源数据 - shared-files 文件夹中的文件列表
+﻿// 资源数据 - shared-files 文件夹中的文件列表
 // Resource data - files in shared-files folder
 // Auto-generated on 2025-12-29 18:24:13
 const resources = [
@@ -35,8 +9,7 @@ const resources = [
         sizeBytes: 27550837,
         format: "APK",
         uploadDate: "2025-12-27",
-        downloadUrl: "shared-files/mt管理器.apk",
-        downloadCount: 0
+        downloadUrl: "shared-files/mt管理器.apk"
     },
     {
         name: "破解软件.apk",
@@ -45,198 +18,19 @@ const resources = [
         sizeBytes: 6665678,
         format: "APK",
         uploadDate: "2025-12-27",
-        downloadUrl: "shared-files/破解软件.apk",
-        downloadCount: 0
+        downloadUrl: "shared-files/破解软件.apk"
     }
 ];
 
-// 从 GitHub API 加载下载次数（跨设备同步）
-async function loadDownloadCounts() {
-    if (!GITHUB_CONFIG.token) {
-        console.log('未配置 GitHub Token，尝试从本地文件加载');
-        loadDownloadCountsFromLocal();
-        return;
-    }
-
-    try {
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            const counts = JSON.parse(atob(data.content));
-            
-            // 更新本地缓存
-            localStorage.setItem('downloadCounts', JSON.stringify(counts));
-            localStorage.setItem('downloadCountsTimestamp', Date.now());
-            
-            // 更新资源数据
-            resources.forEach(resource => {
-                if (counts[resource.name] !== undefined) {
-                    resource.downloadCount = counts[resource.name];
-                }
-            });
-            renderResources(resources);
-            console.log('从 GitHub API 加载下载次数成功');
-        } else {
-            throw new Error(`API 请求失败: ${response.status}`);
-        }
-    } catch (error) {
-        console.log('从 GitHub API 加载失败，使用本地文件:', error.message);
-        // 如果 API 失败，确保资源列表已显示
-        if (document.getElementById('resources').children.length === 0) {
-            renderResources(resources);
-        }
-        loadDownloadCountsFromLocal();
-    }
-}
-
-// 从本地 JSON 文件加载下载次数（备用方案）
-function loadDownloadCountsFromLocal() {
-    fetch('download-counts.json?t=' + Date.now())  // 添加时间戳防止缓存
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('无法加载下载次数');
-        })
-        .then(counts => {
-            resources.forEach(resource => {
-                if (counts[resource.name] !== undefined) {
-                    resource.downloadCount = counts[resource.name];
-                }
-            });
-            renderResources(resources);
-        })
-        .catch(err => {
-            console.log('使用初始下载次数:', err.message);
-            renderResources(resources);
-        });
-}
-
-// 通过 GitHub API 更新下载次数（跨设备同步）
-async function updateDownloadCountViaAPI(resourceName, retryCount = 0) {
-    if (!GITHUB_CONFIG.token) {
-        console.log('未配置 GitHub Token，无法自动更新下载次数');
-        return;
-    }
-
-    try {
-        // 1. 获取当前文件的 SHA（使用 no-cache 确保获取最新版本）
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?t=${Date.now()}`;
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('获取文件失败');
-        }
-
-        const data = await response.json();
-        const sha = data.sha;
-        const currentCounts = JSON.parse(atob(data.content));
-
-        // 2. 更新下载次数（确保不存在则初始化为 0）
-        if (currentCounts[resourceName] === undefined) {
-            currentCounts[resourceName] = 0;
-        }
-        currentCounts[resourceName]++;
-        
-        // 3. 更新资源数据
-        const resource = resources.find(r => r.name === resourceName);
-        if (resource) {
-            resource.downloadCount = currentCounts[resourceName];
-            renderResources(resources);
-        }
-
-        // 4. 提交更新到 GitHub
-        const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(currentCounts, null, 2))));
-        const updateUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-        
-        const updateResponse = await fetch(updateUrl, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/vnd.github.v3+json'
-            },
-            body: JSON.stringify({
-                message: `Update download count for ${resourceName}`,
-                content: updatedContent,
-                sha: sha,
-                branch: 'master'
-            })
-        });
-
-        if (!updateResponse.ok) {
-            const errorData = await updateResponse.json();
-            
-            // 如果是 409 冲突错误，重试
-            if (updateResponse.status === 409 && retryCount < 5) {
-                console.log(`文件冲突，第 ${retryCount + 1} 次重试...`);
-                await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-                return updateDownloadCountViaAPI(resourceName, retryCount + 1);
-            }
-            
-            throw new Error(`更新文件失败: ${errorData.message}`);
-        }
-
-        // 5. 更新本地缓存
-        localStorage.setItem('downloadCounts', JSON.stringify(currentCounts));
-        localStorage.setItem('downloadCountsTimestamp', Date.now());
-        
-        console.log('下载次数更新成功并已同步到 GitHub');
-    } catch (error) {
-        console.error('更新下载次数失败:', error.message);
-    }
-}
-
-// 增加下载次数
-function incrementDownloadCount(resourceName) {
-    const resource = resources.find(r => r.name === resourceName);
-    if (resource) {
-        resource.downloadCount++;
-        renderResources(resources);
-        
-        // 尝试通过 GitHub API 更新
-        if (GITHUB_CONFIG.token) {
-            updateDownloadCountViaAPI(resourceName);
-        } else {
-            console.log('未配置 GitHub Token，下载次数仅在本地更新');
-        }
-    }
-}
-
-// 定期刷新下载次数（每 30 秒）
-function startDownloadCountRefresh() {
-    setInterval(() => {
-        if (GITHUB_CONFIG.token) {
-            loadDownloadCounts();
-        }
-    }, 30000);  // 30 秒刷新一次
-}
-
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
-    // 先渲染资源列表
     renderResources(resources);
-    // 再加载下载次数
-    loadDownloadCounts();
     initSearch();
     initFilter();
     initThemeToggle();
     initSorting();
     initBatchOperations();
     initPreviewModal();
-    startDownloadCountRefresh();  // 启动定期刷新下载次数
 });
 
 // 备用复制方法
@@ -538,7 +332,7 @@ function renderResources(resources) {
     if (resources.length === 0) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td colspan="9" class="empty-state">暂无文件</td>
+            <td colspan="8" class="empty-state">暂无文件</td>
         `;
         resourcesContainer.appendChild(tr);
         return;
@@ -570,9 +364,8 @@ function createResourceElement(resource) {
         <td data-label="大小">${resource.size}</td>
         <td data-label="格式">${resource.format}</td>
         <td data-label="上传时间">${resource.uploadDate}</td>
-        <td data-label="下载次数">${resource.downloadCount}</td>
         <td data-label="操作">
-            <a href="${resource.downloadUrl}" class="download-btn" download onclick="incrementDownloadCount('${resource.name}')">下载</a>
+            <a href="${resource.downloadUrl}" class="download-btn" download>下载</a>
             ${previewBtn}
             <button class="copy-link-btn" data-url="${resource.downloadUrl}" title="复制链接">📋</button>
         </td>
