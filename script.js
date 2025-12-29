@@ -50,9 +50,51 @@ const resources = [
     }
 ];
 
-// 从JSON文件加载下载次数
-function loadDownloadCounts() {
-    fetch('download-counts.json')
+// 从 GitHub API 加载下载次数（跨设备同步）
+async function loadDownloadCounts() {
+    if (!GITHUB_CONFIG.token) {
+        console.log('未配置 GitHub Token，尝试从本地文件加载');
+        loadDownloadCountsFromLocal();
+        return;
+    }
+
+    try {
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const counts = JSON.parse(atob(data.content));
+            
+            // 更新本地缓存
+            localStorage.setItem('downloadCounts', JSON.stringify(counts));
+            localStorage.setItem('downloadCountsTimestamp', Date.now());
+            
+            // 更新资源数据
+            resources.forEach(resource => {
+                if (counts[resource.name] !== undefined) {
+                    resource.downloadCount = counts[resource.name];
+                }
+            });
+            renderResources(resources);
+            console.log('从 GitHub API 加载下载次数成功');
+        } else {
+            throw new Error('API 请求失败');
+        }
+    } catch (error) {
+        console.log('从 GitHub API 加载失败，使用本地文件:', error.message);
+        loadDownloadCountsFromLocal();
+    }
+}
+
+// 从本地 JSON 文件加载下载次数（备用方案）
+function loadDownloadCountsFromLocal() {
+    fetch('download-counts.json?t=' + Date.now())  // 添加时间戳防止缓存
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -73,7 +115,7 @@ function loadDownloadCounts() {
         });
 }
 
-// 通过 GitHub API 更新下载次数
+// 通过 GitHub API 更新下载次数（跨设备同步）
 async function updateDownloadCountViaAPI(resourceName, retryCount = 0) {
     if (!GITHUB_CONFIG.token) {
         console.log('未配置 GitHub Token，无法自动更新下载次数');
@@ -81,8 +123,8 @@ async function updateDownloadCountViaAPI(resourceName, retryCount = 0) {
     }
 
     try {
-        // 1. 获取当前文件的 SHA
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        // 1. 获取当前文件的 SHA（使用 no-cache 确保获取最新版本）
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?t=${Date.now()}`;
         const response = await fetch(url, {
             headers: {
                 'Authorization': `token ${GITHUB_CONFIG.token}`,
@@ -98,51 +140,56 @@ async function updateDownloadCountViaAPI(resourceName, retryCount = 0) {
         const sha = data.sha;
         const currentCounts = JSON.parse(atob(data.content));
 
-        // 2. 更新下载次数
-        if (currentCounts[resourceName] !== undefined) {
-            currentCounts[resourceName]++;
-            
-            // 3. 更新资源数据
-            const resource = resources.find(r => r.name === resourceName);
-            if (resource) {
-                resource.downloadCount = currentCounts[resourceName];
-                renderResources(resources);
-            }
-
-            // 4. 提交更新
-            const updatedContent = btoa(JSON.stringify(currentCounts, null, 2));
-            const updateUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-            
-            const updateResponse = await fetch(updateUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/vnd.github.v3+json'
-                },
-                body: JSON.stringify({
-                    message: `Update download count for ${resourceName}`,
-                    content: updatedContent,
-                    sha: sha,
-                    branch: 'master'
-                })
-            });
-
-            if (!updateResponse.ok) {
-                const errorData = await updateResponse.json();
-                
-                // 如果是 409 冲突错误，重试
-                if (updateResponse.status === 409 && retryCount < 3) {
-                    console.log(`文件冲突，第 ${retryCount + 1} 次重试...`);
-                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // 延迟重试
-                    return updateDownloadCountViaAPI(resourceName, retryCount + 1);
-                }
-                
-                throw new Error(`更新文件失败: ${errorData.message}`);
-            }
-
-            console.log('下载次数更新成功');
+        // 2. 更新下载次数（确保不存在则初始化为 0）
+        if (currentCounts[resourceName] === undefined) {
+            currentCounts[resourceName] = 0;
         }
+        currentCounts[resourceName]++;
+        
+        // 3. 更新资源数据
+        const resource = resources.find(r => r.name === resourceName);
+        if (resource) {
+            resource.downloadCount = currentCounts[resourceName];
+            renderResources(resources);
+        }
+
+        // 4. 提交更新到 GitHub
+        const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(currentCounts, null, 2))));
+        const updateUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        
+        const updateResponse = await fetch(updateUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify({
+                message: `Update download count for ${resourceName}`,
+                content: updatedContent,
+                sha: sha,
+                branch: 'master'
+            })
+        });
+
+        if (!updateResponse.ok) {
+            const errorData = await updateResponse.json();
+            
+            // 如果是 409 冲突错误，重试
+            if (updateResponse.status === 409 && retryCount < 5) {
+                console.log(`文件冲突，第 ${retryCount + 1} 次重试...`);
+                await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+                return updateDownloadCountViaAPI(resourceName, retryCount + 1);
+            }
+            
+            throw new Error(`更新文件失败: ${errorData.message}`);
+        }
+
+        // 5. 更新本地缓存
+        localStorage.setItem('downloadCounts', JSON.stringify(currentCounts));
+        localStorage.setItem('downloadCountsTimestamp', Date.now());
+        
+        console.log('下载次数更新成功并已同步到 GitHub');
     } catch (error) {
         console.error('更新下载次数失败:', error.message);
     }
@@ -164,6 +211,25 @@ function incrementDownloadCount(resourceName) {
     }
 }
 
+// 定期刷新下载次数（每 30 秒）
+function startDownloadCountRefresh() {
+    setInterval(() => {
+        if (GITHUB_CONFIG.token) {
+            loadDownloadCounts();
+        }
+    }, 30000);  // 30 秒刷新一次
+}
+        renderResources(resources);
+        
+        // 尝试通过 GitHub API 更新
+        if (GITHUB_CONFIG.token) {
+            updateDownloadCountViaAPI(resourceName);
+        } else {
+            console.log('未配置 GitHub Token，下载次数仅在本地更新');
+        }
+    }
+}
+
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
     loadDownloadCounts();
@@ -173,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSorting();
     initBatchOperations();
     initPreviewModal();
+    startDownloadCountRefresh();  // 启动定期刷新下载次数
 });
 
 // 备用复制方法
