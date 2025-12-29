@@ -84,10 +84,14 @@ async function loadDownloadCounts() {
             renderResources(resources);
             console.log('从 GitHub API 加载下载次数成功');
         } else {
-            throw new Error('API 请求失败');
+            throw new Error(`API 请求失败: ${response.status}`);
         }
     } catch (error) {
         console.log('从 GitHub API 加载失败，使用本地文件:', error.message);
+        // 如果 API 失败，确保资源列表已显示
+        if (document.getElementById('resources').children.length === 0) {
+            renderResources(resources);
+        }
         loadDownloadCountsFromLocal();
     }
 }
@@ -272,6 +276,11 @@ function showCopySuccess(button) {
 function initPreviewModal() {
     const modal = document.getElementById('previewModal');
     const closeBtn = document.getElementById('closePreview');
+    
+    if (!modal || !closeBtn) {
+        console.log('预览模态框元素不存在，跳过初始化');
+        return;
+    }
     
     closeBtn.addEventListener('click', function() {
         modal.classList.remove('active');
