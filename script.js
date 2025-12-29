@@ -1,7 +1,18 @@
 ﻿// 资源数据 - shared-files 文件夹中的文件列表
 // Resource data - files in shared-files folder
 // Auto-generated on 2025-12-29 18:24:13
+// Resource data - files in shared-files folder
+// Auto-generated on 2025-12-29 21:21:21
 const resources = [
+    {
+        name: "ehviewer.apk",
+        description: "ehviewer",
+        size: "22.17 MB",
+        sizeBytes: 23251511,
+        format: "APK",
+        uploadDate: "2025-12-29",
+        downloadUrl: "shared-files/ehviewer.apk"
+    },
     {
         name: "mt管理器.apk",
         description: "mt管理器",
