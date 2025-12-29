@@ -219,16 +219,6 @@ function startDownloadCountRefresh() {
         }
     }, 30000);  // 30 秒刷新一次
 }
-        renderResources(resources);
-        
-        // 尝试通过 GitHub API 更新
-        if (GITHUB_CONFIG.token) {
-            updateDownloadCountViaAPI(resourceName);
-        } else {
-            console.log('未配置 GitHub Token，下载次数仅在本地更新');
-        }
-    }
-}
 
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
