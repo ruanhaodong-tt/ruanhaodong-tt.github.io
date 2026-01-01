@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源分享站</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container" id="mainContent" style="opacity: 0;">
+        <header>
+            <h1>资源分享站</h1>
+            <p class="creator-info">制作人：阮浩东</p>
+        </header>
+        
+        <main>
+            <section class="resource-list">
+                <h2>资源列表 <span id="resourceCount" class="resource-count">(0)</span></h2>
+                <p class="download-tip">提示：下载速度可能较慢，请耐心等待。如遇下载失败，请尝试刷新页面后重新下载。</p>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索文件名或描述..." />
+                    </div>
+                    <div class="filter-box">
+                        <select id="formatFilter">
+                            <option value="all">所有格式</option>
+                            <option value="APK">APK</option>
+                            <option value="ZIP">ZIP</option>
+                            <option value="PDF">PDF</option>
+                            <option value="EXE">EXE</option>
+                        </select>
+                    </div>
+                    <div class="action-box">
+                        <button id="selectAllBtn" class="action-btn">全选</button>
+                        <button id="deleteSelectedBtn" class="action-btn delete-btn" style="display: none;">删除选中</button>
+                    </div>
+                </div>
+                
+                <table class="resources-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-column"><input type="checkbox" id="selectAllCheckbox" /></th>
+                            <th>文件名</th>
+                            <th class="sortable" data-sort="size">大小</th>
+                            <th>格式</th>
+                            <th class="sortable" data-sort="date">上传时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resources">
+                    </tbody>
+                </table>
+            </section>
+        </main>
+        
+        <footer>
+            <div class="developer-info">
+                <p>© 2026 资源分享站</p>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

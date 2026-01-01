@@ -37,10 +37,56 @@ const resources = [
 
 // DOM 加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
-    renderResources(resources);
+    // 等待背景加载完成
+    waitForBackgroundLoad();
+});
+
+// 等待背景加载完成
+function waitForBackgroundLoad() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainContent = document.getElementById('mainContent');
+    
+    if (!loadingOverlay || !mainContent) {
+        return;
+    }
+    
+    // 创建一个图片对象来预加载背景
+    const bgImage = new Image();
+    bgImage.src = 'https://img.8845.top/acg';
+    
+    bgImage.onload = function() {
+        // 背景加载完成，隐藏遮罩，显示内容
+        setTimeout(function() {
+            loadingOverlay.classList.add('hidden');
+            mainContent.style.opacity = '1';
+            mainContent.style.transition = 'opacity 0.5s ease';
+        }, 500);
+    };
+    
+    bgImage.onerror = function() {
+        // 背景加载失败，仍然显示内容
+        setTimeout(function() {
+            loadingOverlay.classList.add('hidden');
+            mainContent.style.opacity = '1';
+            mainContent.style.transition = 'opacity 0.5s ease';
+        }, 500);
+    };
+    
+    // 设置超时，即使背景加载失败也显示内容（最多等待3秒）
+    setTimeout(function() {
+        if (!loadingOverlay.classList.contains('hidden')) {
+            loadingOverlay.classList.add('hidden');
+            mainContent.style.opacity = '1';
+            mainContent.style.transition = 'opacity 0.5s ease';
+        }
+    }, 3000);
+}
+
+// DOM 加载完成后执行原有功能
+document.addEventListener('DOMContentLoaded', function() {
+    renderResourcesTable(resources);
     initSearch();
     initFilter();
-    initThemeToggle();
     initSorting();
     initBatchOperations();
     initPreviewModal();
@@ -74,7 +120,7 @@ function showCopySuccess(button) {
     button.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
     
     setTimeout(function() {
-        button.textContent = originalText;
+        button.textContent = '复制下载链接';
         button.style.background = '';
     }, 2000);
 }
@@ -236,12 +282,6 @@ function initSorting() {
                 currentSort.direction = 'asc';
             }
 
-            // 更新排序图标
-            document.querySelectorAll('.sort-icon').forEach(icon => {
-                icon.textContent = '↕';
-            });
-            this.querySelector('.sort-icon').textContent = currentSort.direction === 'asc' ? '↑' : '↓';
-
             // 执行排序
             let sortedResources = [...resources];
             
@@ -287,7 +327,7 @@ function applyFiltersAndSort(baseResources) {
         filteredResources = filteredResources.filter(resource => resource.format === selectedFormat);
     }
 
-    renderResources(filteredResources);
+    renderResourcesTable(filteredResources);
 }
 
 // 搜索功能
@@ -306,32 +346,8 @@ function initFilter() {
     });
 }
 
-// 深色模式切换
-function initThemeToggle() {
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = themeToggle.querySelector('.theme-icon');
-    
-    // 检查本地存储中的主题设置
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        themeIcon.textContent = '☀️';
-    }
-    
-    themeToggle.addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        
-        // 保存主题设置
-        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-        
-        // 更新图标
-        themeIcon.textContent = isDarkMode ? '☀️' : '🌙';
-    });
-}
-
-// 渲染资源列表
-function renderResources(resources) {
+// 渲染资源列表（表格视图 - 已弃用，保留用于兼容）
+function renderResourcesTable(resources) {
     const resourcesContainer = document.getElementById('resources');
     const resourceCount = document.getElementById('resourceCount');
 
@@ -361,26 +377,23 @@ function renderResources(resources) {
 // 创建单个资源元素
 function createResourceElement(resource) {
     const tr = document.createElement('tr');
-    const icon = getFileIcon(resource.format);
     
     // 判断是否可以预览
     const canPreview = ['JPG', 'PNG', 'GIF', 'TXT', 'PDF'].includes(resource.format);
-    const previewBtn = canPreview ? `<button class="preview-btn" data-url="${resource.downloadUrl}" data-name="${resource.name}" title="预览">👁️</button>` : '';
+    const previewBtn = canPreview ? `<button class="preview-btn" data-url="${resource.downloadUrl}" data-name="${resource.name}" title="预览">预览</button>` : '';
     
     tr.innerHTML = `
         <td class="checkbox-column" data-label="选择">
             <input type="checkbox" class="resource-checkbox" data-name="${resource.name}" />
         </td>
-        <td class="icon-column" data-label="图标">${icon}</td>
         <td data-label="文件名">${resource.name}</td>
-        <td data-label="描述">${resource.description}</td>
         <td data-label="大小">${resource.size}</td>
         <td data-label="格式">${resource.format}</td>
         <td data-label="上传时间">${resource.uploadDate}</td>
         <td data-label="操作">
             <a href="${resource.downloadUrl}" class="download-btn" download>下载</a>
             ${previewBtn}
-            <button class="copy-link-btn" data-url="${resource.downloadUrl}" title="复制链接">📋</button>
+            <button class="copy-link-btn" data-url="${resource.downloadUrl}" title="复制链接">复制下载链接</button>
         </td>
     `;
 
@@ -420,26 +433,49 @@ function createResourceElement(resource) {
 }
 
 // 根据文件格式获取图标
+
 function getFileIcon(format) {
+
     const icons = {
+
         'APK': '📱',
+
         'ZIP': '📦',
+
         'PDF': '📄',
+
         'EXE': '⚙️',
+
         'RAR': '📦',
+
         '7Z': '📦',
+
         'DOC': '📝',
+
         'DOCX': '📝',
+
         'XLS': '📊',
+
         'XLSX': '📊',
+
         'PPT': '📽️',
+
         'PPTX': '📽️',
+
         'JPG': '🖼️',
+
         'PNG': '🖼️',
+
         'GIF': '🖼️',
+
         'MP3': '🎵',
+
         'MP4': '🎬',
+
         'TXT': '📃'
+
     };
+
     return icons[format] || '📁';
+
 }
