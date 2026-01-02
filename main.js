@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 点击关闭按钮
         if (e.target.classList.contains('close-modal') || e.target.closest('.close-modal')) {
+            console.log('关闭按钮被点击');
             e.preventDefault();
             e.stopPropagation();
             sponsorModal.classList.remove('active');
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 点击遮罩层关闭
         if (e.target === sponsorModal) {
+            console.log('遮罩层被点击');
             sponsorModal.classList.remove('active');
         }
     });
@@ -47,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ESC键关闭模态框
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
+            console.log('ESC键被按下');
             const sponsorModal = document.getElementById('sponsorModal');
             if (sponsorModal && sponsorModal.classList.contains('active')) {
                 sponsorModal.classList.remove('active');
