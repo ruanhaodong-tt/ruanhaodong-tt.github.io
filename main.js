@@ -14,42 +14,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
-    // 获取元素
-    const sponsorBtn = document.getElementById('sponsorBtn');
-    const sponsorModal = document.getElementById('sponsorModal');
-
     // 赞助按钮点击事件
+    const sponsorBtn = document.getElementById('sponsorBtn');
     if (sponsorBtn) {
         sponsorBtn.addEventListener('click', function() {
-            sponsorModal.classList.add('active');
-        });
-    }
-
-    // 点击遮罩层关闭
-    if (sponsorModal) {
-        sponsorModal.addEventListener('click', function(e) {
-            if (e.target === sponsorModal) {
-                sponsorModal.classList.remove('active');
+            const sponsorModal = document.getElementById('sponsorModal');
+            if (sponsorModal) {
+                sponsorModal.classList.add('active');
             }
         });
     }
 
-    // 关闭按钮点击事件
-    const closeModal = document.getElementById('closeModal');
-    if (closeModal) {
-        closeModal.addEventListener('click', function(e) {
+    // 使用事件委托处理所有点击事件
+    document.addEventListener('click', function(e) {
+        const sponsorModal = document.getElementById('sponsorModal');
+        if (!sponsorModal) return;
+
+        // 点击关闭按钮
+        if (e.target.classList.contains('close-modal') || e.target.closest('.close-modal')) {
             e.preventDefault();
             e.stopPropagation();
-            if (sponsorModal) {
-                sponsorModal.classList.remove('active');
-            }
-        });
-    }
+            sponsorModal.classList.remove('active');
+            return;
+        }
+
+        // 点击遮罩层关闭
+        if (e.target === sponsorModal) {
+            sponsorModal.classList.remove('active');
+        }
+    });
 
     // ESC键关闭模态框
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sponsorModal && sponsorModal.classList.contains('active')) {
-            sponsorModal.classList.remove('active');
+        if (e.key === 'Escape') {
+            const sponsorModal = document.getElementById('sponsorModal');
+            if (sponsorModal && sponsorModal.classList.contains('active')) {
+                sponsorModal.classList.remove('active');
+            }
         }
     });
 });
