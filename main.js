@@ -14,23 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
-    // 赞助按钮点击事件
+    // 获取元素
     const sponsorBtn = document.getElementById('sponsorBtn');
     const sponsorModal = document.getElementById('sponsorModal');
-    const closeModal = document.getElementById('closeModal');
 
+    // 赞助按钮点击事件
     if (sponsorBtn) {
         sponsorBtn.addEventListener('click', function() {
             sponsorModal.classList.add('active');
-        });
-    }
-
-    // 关闭按钮点击事件 - 使用更可靠的方式
-    if (closeModal) {
-        closeModal.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            sponsorModal.classList.remove('active');
         });
     }
 
@@ -43,9 +34,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 关闭按钮点击事件
+    const closeModal = document.getElementById('closeModal');
+    if (closeModal) {
+        closeModal.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (sponsorModal) {
+                sponsorModal.classList.remove('active');
+            }
+        });
+    }
+
     // ESC键关闭模态框
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sponsorModal.classList.contains('active')) {
+        if (e.key === 'Escape' && sponsorModal && sponsorModal.classList.contains('active')) {
             sponsorModal.classList.remove('active');
         }
     });
