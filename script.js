@@ -560,16 +560,16 @@ const UploadManager = {
         // 关闭上传模态框
         closeModal.addEventListener('click', function() {
             uploadModal.classList.remove('active');
-            this.resetUploadArea();
-        }.bind(this));
+            UploadManager.resetUploadArea();
+        });
 
         // 点击模态框外部关闭
         uploadModal.addEventListener('click', function(e) {
             if (e.target === uploadModal) {
                 uploadModal.classList.remove('active');
-                this.resetUploadArea();
+                UploadManager.resetUploadArea();
             }
-        }.bind(this));
+        });
 
         // 点击上传区域触发文件选择
         uploadArea.addEventListener('click', function() {
@@ -653,7 +653,7 @@ const UploadManager = {
                 setTimeout(() => {
                     // 上传完成，关闭模态框并显示成功消息
                     document.getElementById('uploadModal').classList.remove('active');
-                    this.resetUploadArea();
+                    UploadManager.resetUploadArea();
                     alert('文件上传成功！');
                 }, 500);
                 return;
